@@ -13,6 +13,9 @@ app.use(express.urlencoded({extended: true, limit: '20kb'}));
 app.use(express.static('public'));
 app.use(cookieParser());
 
+// MUST: Render health check
+app.get('/healthz', (req, res) => res.status(200).json({ ok: true }));
+
 import authRouter from './routes/auth.routes.js';
 app.use('/api/v1/auth', authRouter);
 
