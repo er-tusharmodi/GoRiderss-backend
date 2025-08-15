@@ -69,20 +69,20 @@ const registerUser = asyncHandler(async (req, res) => {
         throw new apiError(500, 'Internal server error');
     }
 });
-const verifyEmailOtp = asyncHandler(async (req, res) => {
-    const { email, otp } = req.body;
-    if (!email || !otp) {
+const verifyOtp = asyncHandler(async (req, res) => {
+    const { target, type, otp } = req.body;
+    if (!target || type || !otp) {
         throw new apiError(400, 'Email and OTP are required');
     }
-    const otpRecord = await otpVerification.findOne({ target:email, otp:otp, verified: false, type:'email' });
+    const otpRecord = await otpVerification.findOne({ target:target, otp:otp, verified: false, type:type });
     if (!otpRecord) {
         throw new apiError(400, 'Invalid or expired OTP');
     }
     if (otpRecord.expiresAt < new Date()) {
         throw new apiError(400, 'OTP has expired');
     }
-    await otpVerification.deleteMany({ target:email });
-    const userUpdate = await User.findOneAndUpdate({email},{status:"pending"});
+    await otpVerification.deleteMany({ target:target });
+    const userUpdate = await User.findOneAndUpdate({target},{status:"pending"});
     if(!userUpdate){
         throw new apiError(400, 'Something went wrong');
     }
@@ -190,7 +190,7 @@ const logoutUser = asyncHandler(async (req, res) => {
 });
 export { 
     registerUser, 
-    verifyEmailOtp, 
+    verifyOtp, 
     resendOtp, 
     loginUser, 
     refreshAccessToken, 

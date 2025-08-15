@@ -1,7 +1,7 @@
 import {Router} from 'express';
 import { 
     registerUser,
-    verifyEmailOtp,
+    verifyOtp,
     resendOtp,
     loginUser,
     refreshAccessToken,
@@ -12,7 +12,7 @@ import { verifyJWT } from '../middlewares/auth.middlewares.js';
 const userRouter = Router();
 
 userRouter.route("/user-register").post(registerUser);
-userRouter.route("/verify-email-otp").post(verifyEmailOtp);
+userRouter.route("/verify-otp").post(verifyOtp);
 userRouter.route("/resend-otp").post(resendOtp);
 userRouter.route("/login-user").post(loginUser);
 userRouter.route("/refresh-token").post(refreshAccessToken);
