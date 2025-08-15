@@ -92,11 +92,11 @@ const verifyEmailOtp = asyncHandler(async (req, res) => {
     });
 });
 const resendOtp = asyncHandler(async (req, res) => {
-    const {email} = req.body;
-    if(!email){
+    const {target,type} = req.body;
+    if(!target || !type){
          return res.status(400).json({ success: false, message: "Email is required" });
     }
-    await otpVerification.deleteMany({ email });
+    await otpVerification.deleteMany({ target });
     const otp = otpGenerator.generate(6, {
         digits: true,
         upperCaseAlphabets: false,
@@ -104,8 +104,8 @@ const resendOtp = asyncHandler(async (req, res) => {
         specialChars: false
     });
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 mins
-    await otpVerification.create({ email, otp, expiresAt });
-    await sendOtpMail(email, otp);
+    await otpVerification.create({ target, otp, expiresAt, type});
+    await sendOtpMail(target, otp);
     return res.status(200).json({
         success: true,
         message: "OTP resent successfully",
