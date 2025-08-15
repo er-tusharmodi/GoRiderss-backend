@@ -71,7 +71,7 @@ const registerUser = asyncHandler(async (req, res) => {
 });
 const verifyOtp = asyncHandler(async (req, res) => {
     const { target, type, otp } = req.body;
-    if (!target || type || !otp) {
+    if (!target || !type || !otp) {
         throw new apiError(400, 'Email and OTP are required');
     }
     const otpRecord = await otpVerification.findOne({ target:target, otp:otp, verified: false, type:type });
