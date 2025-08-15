@@ -82,9 +82,18 @@ const verifyOtp = asyncHandler(async (req, res) => {
         throw new apiError(400, 'OTP has expired');
     }
     await otpVerification.deleteMany({ target:target });
-    const userUpdate = await User.findOneAndUpdate({target},{status:"pending"});
-    if(!userUpdate){
-        throw new apiError(400, 'Something went wrong');
+    if(type === "email") {
+        const user = await User.findOneAndUpdate({email:target}, {status:"pending"}, {new:true});
+        if(!user) {
+            throw new apiError(404, 'User not found');
+        }
+    } else if(type === "mobile") {
+        const user = await User.findOneAndUpdate({mobileNumber:target}, {status:"pending"}, {new:true});
+        if(!user) {
+            throw new apiError(404, 'User not found');
+        }
+    } else {
+        throw new apiError(400, 'Invalid verification type');
     }
     return res.status(200).json({
         success: true,
