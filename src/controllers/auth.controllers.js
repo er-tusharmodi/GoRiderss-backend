@@ -9,6 +9,7 @@ import {otpVerification} from "../models/otpVerification.models.js";
 // Helpers
 import jwt from 'jsonwebtoken';
 import otpGenerator from "otp-generator";
+import ms from "ms";
 
 const generateAccessAndRefreshTokens = async (userId) =>{
     try{
@@ -23,8 +24,8 @@ const generateAccessAndRefreshTokens = async (userId) =>{
     }
 }
 const registerUser = asyncHandler(async (req, res) => {
-    const {email, fullName, mobileNumber, hashedPassword} = req.body;
-    if([email, fullName, mobileNumber, hashedPassword].some(field => !field)) {
+    const {email, fullName, mobileNumber, hashedPassword, userName} = req.body;
+    if([email, fullName, mobileNumber, hashedPassword, userName].some(field => !field)) {
         throw new apiError(400, 'All fields are required');
     }
     const existingUser = await User.findOne({
@@ -32,6 +33,12 @@ const registerUser = asyncHandler(async (req, res) => {
     });
     if (existingUser) {
         throw new apiError(400, 'Email or mobile already exists');
+    }
+    const existingUsername = await User.findOne({
+        $or: [{userName }]
+    });
+    if (existingUsername) {
+        throw new apiError(400, 'username already exists');
     }
     const emailOtp = otpGenerator.generate(6, {
         digits: true,
@@ -51,6 +58,7 @@ const registerUser = asyncHandler(async (req, res) => {
         const user = await User.create({
             email,
             fullName,
+            userName,
             mobileNumber,
             hashedPassword
         });
@@ -121,19 +129,19 @@ const resendOtp = asyncHandler(async (req, res) => {
     });
 });
 const loginUser = asyncHandler(async (req, res) => {
-    const {email, mobileNumber, password} = req.body;
+    const {email, userName, password} = req.body;
     const userIP = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-    if(!email && !mobileNumber){
+    if(!email && !userName){
         throw new apiError(400, "Email or mobile number is required");
     }
     if(!password){
         throw new apiError(400, "Password is required");
     }
     const user = await User.findOne({
-        $or: [{email},{mobileNumber}]
+        $or: [{email},{userName}]
     });
     if(!user){
-        throw new apiError(404, "User not found");
+        throw new apiError(404, "Wrong username or password");
     }
     if (user.status === "inActive") {
         throw new apiError(403, "Your account is not active");
@@ -143,7 +151,7 @@ const loginUser = asyncHandler(async (req, res) => {
         throw new apiError (401,"Invalid password")
     }
     const {accessToken, refreshToken} = await generateAccessAndRefreshTokens(user._id);
-    const loggedInUser = await User.findById(user._id).select("fullName email mobileNumber avatarFileId");
+    const loggedInUser = await User.findById(user._id).select("fullName userName email emailDisplay mobileNumber mobileNumberDisplay healthHistory address bio avatarUrl coverImageUrl bloodGroup dob sex");
     const option = {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production"
@@ -153,7 +161,7 @@ const loginUser = asyncHandler(async (req, res) => {
     return res
         .cookie("accessToken",accessToken,option)
         .cookie("refreshToken",refreshToken,option)
-        .json(new apiResponse(200,{user:loggedInUser,accessToken,refreshToken},`Login successfully`))
+        .json(new apiResponse(200,{user:loggedInUser,accessToken,refreshToken},`Login successfully`));
 });
 const refreshAccessToken = asyncHandler(async (req, res) => {
     const incomingRefreshToken = req.cookies.refreshToken || req.body.refreshToken;

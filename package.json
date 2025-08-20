@@ -6,7 +6,9 @@
   "author": "Tushar Modi",
   "type": "module",
   "main": "index.js",
-  "engines": { "node": ">=18 <23" },
+  "engines": {
+    "node": ">=18 <23"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node src/index.js",
