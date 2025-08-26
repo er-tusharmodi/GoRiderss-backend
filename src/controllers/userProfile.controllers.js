@@ -29,6 +29,7 @@ const updateUserProfile = asyncHandler(async (req, res) => {
         bloodGroup: bloodGroup || undefined,
         instagramLink: instagramLink || undefined,
         youtubeLink: youtubeLink || undefined,
+        linkedinLink: youtubeLink || undefined,
         healthHistory,
         address,
         bio,
@@ -158,12 +159,13 @@ const deleteBike = asyncHandler(async (req, res) => {
     return res.status(200).json(new apiResponse(200,"Deleted successfully"));
 });
 const createRidingDetail = asyncHandler(async (req, res) => {
-    const {fromDate, toDate, source, destination, details, bike, kilometer} = req.body;
-    if(!fromDate || !toDate || !source || !destination || !bike){
+    const {title,fromDate, toDate, source, destination, details, bike, kilometer} = req.body;
+    if(!title || !fromDate || !toDate || !source || !destination || !bike){
         throw new apiError(401,"All fields are required");
     }
     const createRidingPortfolio = await RidingPortfolio.create({
         userID: req.user?._id,
+        title,
         fromDate,
         toDate,
         source,
@@ -197,11 +199,12 @@ const editRidingPortfolio = asyncHandler(async (req, res) => {
     if(!deletedRidingPortfolio){
         throw new apiError(401,"Invalid riding ID");
     }
-    const {fromDate, toDate, source, destination, details, bike, kilometer} = req.body;
-    if(!fromDate || !toDate || !source || !destination || !bike){
+    const {title, fromDate, toDate, source, destination, details, bike, kilometer} = req.body;
+    if(!title || !fromDate || !toDate || !source || !destination || !bike){
         throw new apiError(401,"All fields are required");
     }
     const ridingPortfolioDetails = await RidingPortfolio.findByIdAndUpdate(ridingID,{
+        title,
         fromDate,
         toDate,
         source,
@@ -224,6 +227,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
     if(!user){
         throw new apiError(400,"User not found");
     }
+    const bikesList = await Bikes.find({userID: userID});
     const result = await User.aggregate([
         {
         $match: { _id: new mongoose.Types.ObjectId(userID) }
@@ -270,20 +274,44 @@ const getUserProfile = asyncHandler(async (req, res) => {
             bloodGroup: { $first: "$bloodGroup" },
             instagramLink: { $first: "$instagramLink" },
             youtubeLink: { $first: "$youtubeLink" },
+            linkedinLink: { $first: "$linkedinLink" },
             healthHistory: { $first: "$healthHistory" },
-            ridingPortfolio: {
-            $push: {
-                fromDate: "$ridingPortfolio.fromDate",
-                toDate: "$ridingPortfolio.toDate",
-                source: "$ridingPortfolio.source",
-                destination: "$ridingPortfolio.destination",
-                kilometer: "$ridingPortfolio.kilometer",
-                details: "$ridingPortfolio.details",
-                bike: {
-                _id: "$ridingPortfolio.bikeInfo._id",
-                bikeName: "$ridingPortfolio.bikeInfo.bikeName"
+            address: { $first: "$address" },
+            profileCounts: {
+                $first:{
+                    Trips:0,
+                    Posts:0,
+                    Followers:0,
+                    Following:0,
+                    Friends:0,
+                    totalDistance:0,
+                    totalBikes:0,
+                    totalRides:0,
+                    statesCovered:0,
+                    experience:0
                 }
-            }
+            },
+            bikesList: {
+                $first:{
+                    list: bikesList,
+                    totalBikes: bikesList.length
+                }
+            },
+            ridingPortfolio: {
+                $push: {
+                    title: "$ridingPortfolio.title",
+                    fromDate: "$ridingPortfolio.fromDate",
+                    toDate: "$ridingPortfolio.toDate",
+                    source: "$ridingPortfolio.source",
+                    destination: "$ridingPortfolio.destination",
+                    kilometer: "$ridingPortfolio.kilometer",
+                    details: "$ridingPortfolio.details",
+                    bike: {
+                        _id: "$ridingPortfolio.bikeInfo._id",
+                        bikeName: "$ridingPortfolio.bikeInfo.bikeName",
+                        bikeDetails: "$ridingPortfolio.bikeInfo.bikeDetails"
+                    }
+                }
             }
         }
         }

@@ -12,7 +12,7 @@ const HOST = 'localhost'; // Render के लिए जरूरी
 
 connectDB()
   .then(() => {
-    app.listen(PORT, HOST, () => {
+    app.listen(PORT, () => {
       console.log(`🚀 Server is running on http://${HOST}:${PORT}`);
     });
   })

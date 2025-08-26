@@ -9,6 +9,7 @@ import {User} from '../models/users.models.js';
 import {Groups} from '../models/groups.models.js';
 import {TripGroups} from '../models/tripGroups.models.js'
 import {GroupAndTripMember} from '../models/groupAndTripMembers.models.js';
+import {TripCheckpoints} from '../models/tripCheckpoints.models.js';
 // Helpers
 import jwt from 'jsonwebtoken';
 import mongoose from "mongoose";
@@ -83,11 +84,12 @@ const userGroupsList = asyncHandler(async (req,res) => {
     return res.status(200).json(new apiResponse(200,groupsList,"Groups list fetched successfully"));
 });
 const createTrip = asyncHandler(async (req, res) => {
-    const {tripName, source, destination, startDate, endDate, remarks, guidelines, budget, isPublic, onlyAdminMsg, paymentAmount} = req.body;
+    const {tripName, source, destination, startDate, endDate, remarks, guidelines, budget, isPublic, onlyAdminMsg, checkpoints} = req.body;
     const profileImagePath =  req.file?.path || req.files?.profileImage?.[0]?.path;
     if(!tripName || !source || !destination || !startDate || !endDate || !guidelines || !onlyAdminMsg || !isPublic || !profileImagePath){
         throw new apiError(401,"All fields are required");
     }
+    
     const finalPath = await compressImage(profileImagePath);
     const uploadedFile = await uploadImage(finalPath, "TripsAndGroups");
     const TripGroupsCreated = await TripGroups.create({
@@ -101,7 +103,6 @@ const createTrip = asyncHandler(async (req, res) => {
         budget,
         isPublic,
         onlyAdminMsg,
-        paymentAmount,
         profileImage:uploadedFile.url,
         profileImageID:uploadedFile.fileId,
         createdBy:req.user?._id
@@ -119,6 +120,19 @@ const createTrip = asyncHandler(async (req, res) => {
     });
     if(!addingUserInTripGroup){
         throw new apiError(401,"Somthing went wrong");
+    }
+    const checkpointsArray = JSON.parse(checkpoints || "[]");
+    if(checkpointsArray.length > 0){
+        const formattedCheckpoints = checkpointsArray.map((checkpoint) => ({
+            tripId: TripGroupsCreated._id,
+            title: checkpoint.title,
+            description: checkpoint.description || "",
+            timeToReach: checkpoint.timeToReach,
+            km: checkpoint.km || "",
+            timeToLeave: checkpoint.timeToLeave || "",
+            createdBy: req.user?._id
+        }));
+        await TripCheckpoints.insertMany(formattedCheckpoints);
     }
     return res.status(200).json(new apiResponse(200,TripGroupsCreated,"Trip created successfully"));
 });

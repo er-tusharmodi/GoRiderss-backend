@@ -63,6 +63,10 @@ const userSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    linkedinLink: {
+      type: String,
+      trim: true,
+    },
     healthHistory: {
       type: String,
       default: "",

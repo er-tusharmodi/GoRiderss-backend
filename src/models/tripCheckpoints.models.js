@@ -16,7 +16,7 @@ const tripCheckpointSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
-    dateTime: {
+    timeToReach: {
       type: Date,
       required: true,
     },
@@ -24,8 +24,8 @@ const tripCheckpointSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
-    timeToReach: {
-      type: String,
+    timeToLeave: {
+      type: Date,
       default: "",
     },
     createdBy: {
@@ -40,4 +40,4 @@ const tripCheckpointSchema = new mongoose.Schema(
   }
 );
 
-export const TripCheckpoint = mongoose.model("TripCheckpoints", tripCheckpointSchema);
+export const TripCheckpoints = mongoose.model("TripCheckpoints", tripCheckpointSchema);

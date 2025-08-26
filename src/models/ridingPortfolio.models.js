@@ -7,6 +7,10 @@ const ridingPortfolioSchema = new mongoose.Schema(
       ref: "Users",
       required: true,
     },
+    title: {
+      type: String,
+      required: true,
+    },
     fromDate: {
       type: Date,
       required: true,

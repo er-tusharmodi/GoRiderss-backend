@@ -46,10 +46,6 @@ const tripGroupSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    paymentAmount: {
-      type: String,
-      default: 0,
-    },
     profileImage: {
       type: String,
       default: "", // URL or ImageKit URL
