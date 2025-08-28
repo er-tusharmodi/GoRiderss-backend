@@ -4,9 +4,9 @@ import {
     userGroupsList,
     createTrip,
     userTripsList
-} from '../controllers/groupAndTrip.controllers.js';
-import {upload} from '../middlewares/multer.middlewares.js';
-import { verifyJWT } from '../middlewares/auth.middlewares.js';
+} from '../controllers/groupAndTrip.controller.js';
+import {upload} from '../middlewares/multer.middleware.js';
+import { verifyJWT } from '../middlewares/auth.middleware.js';
 
 const groupAndTripRouter = Router();
 groupAndTripRouter.use(verifyJWT);

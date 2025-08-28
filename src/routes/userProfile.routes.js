@@ -12,10 +12,11 @@ import {
     ridingPortfolioList,
     deleteRidingPortfolio,
     editRidingPortfolio,
-    getUserProfile
-} from '../controllers/userProfile.controllers.js';
-import {upload} from '../middlewares/multer.middlewares.js';
-import { verifyJWT } from '../middlewares/auth.middlewares.js';
+    getUserProfile,
+    searchUsers
+} from '../controllers/userProfile.controller.js';
+import {upload} from '../middlewares/multer.middleware.js';
+import { verifyJWT } from '../middlewares/auth.middleware.js';
 
 const userRouter = Router();
 userRouter.use(verifyJWT);
@@ -33,6 +34,7 @@ userRouter.route("/riding-portfolio-list").get(verifyJWT,ridingPortfolioList);
 userRouter.route("/delete-riding-portfolio/:ridingID").delete(verifyJWT,deleteRidingPortfolio);
 userRouter.route("/edit-riding-portfolio/:ridingID").patch(verifyJWT,editRidingPortfolio);
 userRouter.route("/get-user-profile/:userID").get(getUserProfile);
+userRouter.route("/search-users").get(verifyJWT,searchUsers);
 
 
 export default userRouter;

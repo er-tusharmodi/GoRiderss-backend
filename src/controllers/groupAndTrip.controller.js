@@ -5,11 +5,10 @@ import {asyncHandler} from '../utils/asyncHandler.js';
 import {apiError} from '../utils/apiError.js';
 import {apiResponse} from '../utils/apiResponse.js';
 // Models
-import {User} from '../models/users.models.js';
-import {Groups} from '../models/groups.models.js';
-import {TripGroups} from '../models/tripGroups.models.js'
-import {GroupAndTripMember} from '../models/groupAndTripMembers.models.js';
-import {TripCheckpoints} from '../models/tripCheckpoints.models.js';
+import {Groups} from '../models/groups.model.js';
+import {TripGroups} from '../models/tripGroups.model.js'
+import {GroupAndTripMember} from '../models/groupAndTripMembers.model.js';
+import {TripCheckpoints} from '../models/tripCheckpoints.model.js';
 // Helpers
 import jwt from 'jsonwebtoken';
 import mongoose from "mongoose";

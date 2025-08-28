@@ -4,8 +4,8 @@ import {apiResponse} from '../utils/apiResponse.js';
 import {asyncHandler} from '../utils/asyncHandler.js';
 import {apiError} from '../utils/apiError.js';
 // Models
-import {User} from '../models/users.models.js';
-import {otpVerification} from "../models/otpVerification.models.js";
+import {User} from '../models/users.model.js';
+import {otpVerification} from "../models/otpVerification.model.js";
 // Helpers
 import jwt from 'jsonwebtoken';
 import otpGenerator from "otp-generator";

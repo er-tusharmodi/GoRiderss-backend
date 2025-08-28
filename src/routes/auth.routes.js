@@ -6,8 +6,8 @@ import {
     loginUser,
     refreshAccessToken,
     logoutUser
-} from '../controllers/auth.controllers.js';
-import { verifyJWT } from '../middlewares/auth.middlewares.js';
+} from '../controllers/auth.controller.js';
+import { verifyJWT } from '../middlewares/auth.middleware.js';
 
 const userRouter = Router();
 
